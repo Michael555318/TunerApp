@@ -1,6 +1,7 @@
 package com.example.tunertest1;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
 import android.os.Handler;
@@ -15,25 +16,40 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.transform.DftNormalization;
+import org.apache.commons.math3.transform.FastFourierTransformer;
+import org.apache.commons.math3.transform.TransformType;
 
 import java.io.IOException;
+
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+import be.tarsos.dsp.pitch.PitchDetectionHandler;
+import be.tarsos.dsp.pitch.PitchDetectionResult;
+import be.tarsos.dsp.pitch.PitchProcessor;
 
 import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity {
 
     // Instance Variables
-    Button recordButton;
     TextView display;
-    MediaRecorder recorder;
-    private double t = 0;
-    private int counter = 0;
-    boolean mStartRecording = true;
-    Complex[] amplitudeFunction = new Complex[SAMPLE_AMOUNT];
+    TextView diffBelow;
+    TextView diffAbove;
+    private final double[] noteFrequencies = new double[]{5587.65, 5274.04, 4978.03, 4698.64, 4434.92,
+            4186.01, 3951.07, 3729.31, 3520.00, 3322.44, 3135.96, 2959.96, 2793.83, 2637.02, 2489.02,
+            2349.32, 2217.46, 2093.00, 1975.53, 1864.66, 1760.00, 1661.22, 1567.98, 1479.98, 1396.91,
+            1318.51, 1244.51, 1174.66, 1108.73, 1046.50, 987.767, 932.328, 880.000, 830.609, 783.991,
+            739.989, 698.456, 659.255, 622.254, 587.330, 554.365, 523.251, 493.883, 466.164, 440.000,
+            415.305, 391.995, 369.994, 349.228, 329.628, 311.127, 293.665, 277.183, 261.626, 246.942,
+            233.082, 220.000, 207.652, 195.998, 184.997, 174.614, 164.814, 155.563, 146.832, 138.591,
+            130.813, 123.471, 116.541, 110.000, 103.826, 97.9989, 92.4986, 87.3071, 82.4069, 77.7817,
+            73.4162, 69.2957, 65.4064, 61.7354, 58.2705, 55.0000, 51.9131, 48.9994, 46.2493, 43.6535,
+            41.2034, 38.8909, 36.7081, 34.6478, 32.7032, 30.8677, 29.1352, 27.5000, 25.9565, 24.4997,
+            23.1247, 21.8268, 20.6017, 19.4454, 18.3540, 17.3239, 16.3516};
 
-    private final static double SAMPLE_TIME = 1;
-    private final static int SAMPLE_AMOUNT = 50;
-    private final static double INTERVAL = SAMPLE_TIME / SAMPLE_AMOUNT;
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
@@ -52,168 +68,119 @@ public class MainActivity extends AppCompatActivity {
         if (!permissionToRecordAccepted) finish();
     }
 
-
     // Constants
     final static int RECORD_PERMISSION = 100;
-    final static String LOG_TAG = "Audio Test Prepare";
-    private static String fileName = null;
-    private static int AMP_REF = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fileName = getExternalCacheDir().getAbsolutePath();
-        fileName += "/audiorecordtest.3gp";
+
         ActivityCompat.requestPermissions(this, permissions,
                 RECORD_PERMISSION);
 
-        // WireWidgets - record button and display textview
-        recordButton = findViewById(R.id.button_main_record);
         display = findViewById(R.id.textView_main_display);
+        diffBelow = findViewById(R.id.textView_below);
+        diffAbove = findViewById(R.id.textView_above);
 
-        recordButton.setOnClickListener(new View.OnClickListener() {
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+
+        PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
-            public void onClick(View view) {
-                onRecord(mStartRecording);
-                if (mStartRecording) {
-                    recordButton.setText("Stop recording");
-                    final Handler handler=new Handler();
-                    handler.post(new Runnable(){
-                        @Override
-                        public void run() {
-                            // upadte textView here
-                            if (recorder != null) {
-                                if (t <= SAMPLE_TIME) {
-                                    int amplitude = recorder.getMaxAmplitude();
-                                    amplitudeFunction[counter] = new Complex(t*INTERVAL, amplitude);
-                                    t += INTERVAL;
-                                    counter++;
-                                } else {
-                                    display.setText("" + determineFrequency(fft(amplitudeFunction)));
-                                    reset();
-                                }
-                                //Log.i("AMPLITUDE", new Integer(amplitude).toString());
-                            }
-                            handler.postDelayed(this,(long)INTERVAL*1000); // set time here to refresh textView
-                        }
-                    });
-                } else {
-                    recordButton.setText("Start recording");
-                }
-                mStartRecording = !mStartRecording;
+            public void handlePitch(PitchDetectionResult result, AudioEvent e) {
+                final float pitchInHz = result.getPitch();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        display.setText("" + findNote(pitchInHz));
+                    }
+                });
             }
-        });
+        };
+        AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+        dispatcher.addAudioProcessor(p);
+        new Thread(dispatcher,"Audio Dispatcher").start();
 
     }
 
-    // Recording Methods
-    private void startRecording() {
-        recorder = new MediaRecorder();
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        recorder.setOutputFile(fileName);
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        try {
-            recorder.prepare();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
+    private String findNote(double frequency) {
+        double minDifference = 10;
+        int index = 0;
+        for (int i = 0; i < noteFrequencies.length; i++) {
+            if (Math.abs(frequency - noteFrequencies[i]) <= minDifference) {
+                minDifference = Math.abs(frequency - noteFrequencies[i]);
+                index = i;
+            }
         }
-
-        recorder.start();
+        return getNoteName(index);
     }
 
-    private void onRecord(boolean start) {
-        if (start) {
-            startRecording();;
+    private int findScaledDiff(double frequency) {  // percent off from a scale of 1 to 10
+        double minDifference = 10;
+        int index = 0;
+
+        for (int i = 0; i < noteFrequencies.length; i++) {
+            if (Math.abs(frequency - noteFrequencies[i]) <= minDifference) {
+                minDifference = Math.abs(frequency - noteFrequencies[i]);
+                index = i;
+            }
+        }
+        if (index > 0) {
+            double lastFrequency = noteFrequencies[index-1];
+            double thisFrequency = noteFrequencies[index];
+            double nextFrequency = noteFrequencies[index+1];
+            if (frequency >= lastFrequency && frequency <= thisFrequency) {
+                double diff = thisFrequency - lastFrequency;
+                double scaleSection = diff / 10;
+                int n = 1;
+                while (thisFrequency - n*scaleSection > frequency) {
+                    thisFrequency -= n*scaleSection;
+                    n++;
+                }
+                return n;
+            } else if (frequency >= thisFrequency && frequency <= nextFrequency) {
+                double diff = nextFrequency - thisFrequency;
+                double scaleSection = diff / 10;
+                int n = 1;
+                while (thisFrequency + n*scaleSection < frequency) {
+                    thisFrequency += n*scaleSection;
+                    n++;
+                }
+                return n;
+            }
+        }
+        return 0;
+    }
+
+    private String getNoteName(int index) {
+        if (index%12 == 0) {
+            return "C";
+        } else if (index%12 == 1) {
+            return "C♯";
+        } else if (index%12 == 2) {
+            return "D";
+        } else if (index%12 == 3) {
+            return "E♭";
+        } else if (index%12 == 4) {
+            return "E";
+        } else if (index%12 == 5) {
+            return "F";
+        } else if (index%12 == 6) {
+            return "F♯";
+        } else if (index%12 == 7) {
+            return "G";
+        } else if (index%12 == 8) {
+            return "G♯";
+        } else if (index%12 == 9) {
+            return "A";
+        } else if (index%12 == 10) {
+            return "B♭";
         } else {
-            stopRecording();
+            return "B";
         }
-    }
-
-    private void stopRecording() {
-        recorder.stop();
-        recorder.release();
-        recorder = null;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (recorder != null) {
-            recorder.release();
-            recorder = null;
-        }
-    }
-
-    private void displayAmplitude(final TextView displayer) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int i = 0;
-                while (i == 0) {
-
-                    try {
-                        sleep(250);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (recorder != null) {
-                        int amplitude = recorder.getMaxAmplitude();
-
-                        //Here you can put condition (low/high)
-                        Log.i("AMPLITUDE", new Integer(amplitude).toString());
-                        displayer.setText(new Integer(amplitude).toString());
-                    }
-                }
-            }
-        });
-    }
-
-    public static Complex[] fft(Complex[] x) {
-        int N = x.length;
-
-        // fft of even terms
-        Complex[] even = new Complex[N / 2];
-        for (int k = 0; k < N / 2; k++) {
-            even[k] = x[2 * k];
-        }
-        Complex[] q = fft(even);
-
-        // fft of odd terms
-        Complex[] odd = even; // reuse the array
-        for (int k = 0; k < N / 2; k++) {
-            odd[k] = x[2 * k + 1];
-        }
-        Complex[] r = fft(odd);
-
-        // combine
-        Complex[] y = new Complex[N];
-        for (int k = 0; k < N / 2; k++) {
-            double kth = -2 * k * Math.PI / N;
-            Complex wk = new Complex(Math.cos(kth), Math.sin(kth));
-            y[k] = q[k].add(wk.multiply(r[k]));
-            y[k + N / 2] = q[k].subtract(wk.multiply(r[k]));
-        }
-        return y;
-    }
-
-    private double determineFrequency(Complex[] a) {
-        double maxF = 0;
-        for (int i = 0; i < a.length; i++) {
-            if (a[i].getReal() > maxF) {
-                maxF = a[i].getReal();
-            }
-        }
-        return maxF;
-    }
-
-    private void reset() {
-        t = 0;
-        counter = 0;
     }
 
 }
 
+//  ♯   ♭
