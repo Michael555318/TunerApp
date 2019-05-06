@@ -6,41 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textView_main_display"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="164dp"
-        android:text="Hello World!"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textView_below"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/textView_main_display"
-        app:layout_constraintEnd_toStartOf="@+id/textView_above"
-        app:layout_constraintHorizontal_bias="0.156"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_main_display" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textiew_displayNote"
+            android:textSize="50dp"
+            android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/textView_above"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="28dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/textView_main_display"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_main_display" />
+        <com.github.anastr.speedviewlib.SpeedView
+            android:id="@+id/speedView"
+            android:layout_width="wrap_content"
+            android:layout_height="237dp"
+            android:layout_gravity="center"
+            app:sv_endDegree="360"
+            app:sv_highSpeedColor="#F53309"
+            app:sv_lowSpeedColor="#F53309"
+            app:sv_lowSpeedPercent="44"
+            app:sv_maxSpeed="10"
+            app:sv_mediumSpeedColor="#78f503"
+            app:sv_mediumSpeedPercent="56"
+            app:sv_minSpeed="-10"
+            app:sv_speedTextPosition="CENTER"
+            app:sv_speedometerWidth="30dp"
+            app:sv_startDegree="180"
+            app:sv_unit=" " />
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
