@@ -3,6 +3,7 @@ package com.example.tunertest1;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Matrix;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private int progressBarTimer = 1;
     private float lastPitch;
     private int pitchTimer = 3;
+    private ImageView cr_scale;
+    private TextView octive;
 
     private final double[] noteFrequencies = new double[]{  7902,    7459,    7040,    6645,    6272,
                5920, 5587.65, 5274.04, 4978.03, 4698.64, 4434.92, 4186.01, 3951.07, 3729.31, 3520.00,
@@ -137,7 +141,9 @@ public class MainActivity extends AppCompatActivity {
                                 differenceDisplay.speedPercentTo(10, 300);
                             }
                         }
-                        displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
+                        //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
+                        octive.setText("" + getOctive(pitchInHz));
+                        cr_scale.setRotation(getRotationAngle(findNote(roundPitch(lastPitch, pitchInHz))));
                         if (Math.abs(findScaledDiff(roundPitch(lastPitch, pitchInHz))) <= 1
                                  && progressBarTimer < 50) {
                             tuneProgressBar.speedPercentTo(progressBarTimer*6);
@@ -149,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                             tuneProgressBar.speedPercentTo(0, 1000);
                             progressBarTimer = 1;
                         }
-                        Log.d("tag", "" + findScaledDiff(roundPitch(lastPitch, pitchInHz)));
+                        Log.d("tag", "" + findNote(roundPitch(lastPitch, pitchInHz)));
                     }
                 });
             }
@@ -164,6 +170,68 @@ public class MainActivity extends AppCompatActivity {
         differenceDisplay = findViewById(R.id.speedView);
         displayNote = findViewById(R.id.textiew_displayNote);
         tuneProgressBar = findViewById(R.id.tuneProgressBar);
+        cr_scale = findViewById(R.id.cr_image);
+        octive = findViewById(R.id.octiveDisplay);
+    }
+
+    private int getOctive(double f) {
+        double minDifference = 10;
+        int index = 0;
+        if (f!= -1) {
+            for (int i = 0; i < noteFrequencies.length; i++) {
+                if (Math.abs(f - noteFrequencies[i]) <= minDifference) {
+                    minDifference = Math.abs(f - noteFrequencies[i]);
+                    index = i;
+                }
+            }
+        }
+        if (index <= 11) {
+            return 8;
+        } else if (index <= 11+12) {
+            return 7;
+        } else if (index <= 11+12*2) {
+            return 6;
+        } else if (index <= 11+12*3) {
+            return 5;
+        } else if (index <= 11+12*4) {
+            return 4;
+        } else if (index <= 11+12*5) {
+            return 3;
+        } else if (index <= 11+12*6) {
+            return 2;
+        } else if (index <= 11+12*7) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    private float getRotationAngle(String note) {
+        if (note.equals("C")) {
+            return 90;
+        } else if (note.equals("C♯")) {
+            return 60;
+        } else if (note.equals("D")) {
+            return 30;
+        } else if (note.equals("E♭")) {
+            return 0;
+        } else if (note.equals("E")) {
+            return -30;
+        } else if (note.equals("F")) {
+            return -60;
+        } else if (note.equals("F♯")) {
+            return -90;
+        } else if (note.equals("G")) {
+            return -120;
+        } else if (note.equals("G♯")) {
+            return -150;
+        } else if (note.equals("A")) {
+            return 180;
+        } else if (note.equals("B♭")) {
+            return 150;
+        } else {
+            return 120;
+        }
     }
 
     private double roundPitch(double lastf, double thisf) {
