@@ -14,10 +14,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.github.anastr.speedviewlib.ImageLinearGauge;
 import com.github.anastr.speedviewlib.SpeedView;
 
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.exception.util.ExceptionContextProvider;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
@@ -32,6 +35,7 @@ import be.tarsos.dsp.pitch.PitchDetectionHandler;
 import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     // Instance Variables
     private SpeedView differenceDisplay;
     private TextView displayNote;
+    private ImageLinearGauge tuneProgressBar;
+    private int progressBarTimer = 1;
+    private float lastPitch;
+    private int pitchTimer = 3;
 
     private final double[] noteFrequencies = new double[]{  7902,    7459,    7040,    6645,    6272,
                5920, 5587.65, 5274.04, 4978.03, 4698.64, 4434.92, 4186.01, 3951.07, 3729.31, 3520.00,
@@ -94,8 +102,54 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         //display.setText("" + findNote(pitchInHz));
-                        differenceDisplay.speedTo(findScaledDiff(pitchInHz), 1000);
-                        displayNote.setText(findNote(pitchInHz));
+                        if (pitchTimer == 3) {
+                            lastPitch = pitchInHz;
+                            pitchTimer = 0;
+                        }
+                        if (pitchInHz == -1) {
+                            pitchTimer++;
+                        }
+                        double diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
+                        if (Math.abs(diff) <= 1) {
+                            differenceDisplay.speedPercentTo(50, 300);
+                        } else if (Math.abs(diff) <= 2) {
+                            if (diff > 0) {
+                                differenceDisplay.speedPercentTo(60, 300);
+                            } else {
+                                differenceDisplay.speedPercentTo(40, 300);
+                            }
+                        } else if (Math.abs(diff) <= 3) {
+                            if (diff > 0) {
+                                differenceDisplay.speedPercentTo(70, 300);
+                            } else {
+                                differenceDisplay.speedPercentTo(30, 300);
+                            }
+                        } else if (Math.abs(diff) <= 4) {
+                            if (diff > 0) {
+                                differenceDisplay.speedPercentTo(80, 300);
+                            } else {
+                                differenceDisplay.speedPercentTo(20, 300);
+                            }
+                        } else {
+                            if (diff > 0) {
+                                differenceDisplay.speedPercentTo(90, 300);
+                            } else {
+                                differenceDisplay.speedPercentTo(10, 300);
+                            }
+                        }
+                        displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
+                        if (Math.abs(findScaledDiff(roundPitch(lastPitch, pitchInHz))) <= 1
+                                 && progressBarTimer < 50) {
+                            tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                            progressBarTimer++;
+                            if (tuneProgressBar.getCurrentSpeed() >= 90) {
+                                Toast.makeText(MainActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            tuneProgressBar.speedPercentTo(0, 1000);
+                            progressBarTimer = 1;
+                        }
+                        Log.d("tag", "" + findScaledDiff(roundPitch(lastPitch, pitchInHz)));
                     }
                 });
             }
@@ -109,6 +163,14 @@ public class MainActivity extends AppCompatActivity {
     private void wireWidgets() {
         differenceDisplay = findViewById(R.id.speedView);
         displayNote = findViewById(R.id.textiew_displayNote);
+        tuneProgressBar = findViewById(R.id.tuneProgressBar);
+    }
+
+    private double roundPitch(double lastf, double thisf) {
+        if (thisf == -1 && lastPitch != -1) {
+            return lastf;
+        }
+        return thisf;
     }
 
     private String findNote(double frequency) {
@@ -163,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        return 0;
+        return -10;
 
     }
 

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -11,11 +12,21 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <com.github.anastr.speedviewlib.ImageLinearGauge
+            android:id="@+id/tuneProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:sv_image="@drawable/lime_green"
+            app:sv_speedTextPosition="BOTTOM_CENTER"
+            app:sv_speedometerBackColor="#000000"
+            app:sv_unit=" " />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textiew_displayNote"
             android:textSize="50dp"
+            android:textColor="#ffffff"
             android:textAlignment="center" />
 
         <com.github.anastr.speedviewlib.SpeedView
@@ -26,11 +37,9 @@
             app:sv_endDegree="360"
             app:sv_highSpeedColor="#F53309"
             app:sv_lowSpeedColor="#F53309"
-            app:sv_lowSpeedPercent="44"
-            app:sv_maxSpeed="10"
+            app:sv_lowSpeedPercent="45"
             app:sv_mediumSpeedColor="#78f503"
-            app:sv_mediumSpeedPercent="56"
-            app:sv_minSpeed="-10"
+            app:sv_mediumSpeedPercent="55"
             app:sv_speedTextPosition="CENTER"
             app:sv_speedometerWidth="30dp"
             app:sv_startDegree="180"
