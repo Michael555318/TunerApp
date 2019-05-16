@@ -114,33 +114,7 @@ public class MainActivity extends AppCompatActivity {
                             pitchTimer++;
                         }
                         double diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
-                        if (Math.abs(diff) <= 1) {
-                            differenceDisplay.speedPercentTo(50, 300);
-                        } else if (Math.abs(diff) <= 2) {
-                            if (diff > 0) {
-                                differenceDisplay.speedPercentTo(60, 300);
-                            } else {
-                                differenceDisplay.speedPercentTo(40, 300);
-                            }
-                        } else if (Math.abs(diff) <= 3) {
-                            if (diff > 0) {
-                                differenceDisplay.speedPercentTo(70, 300);
-                            } else {
-                                differenceDisplay.speedPercentTo(30, 300);
-                            }
-                        } else if (Math.abs(diff) <= 4) {
-                            if (diff > 0) {
-                                differenceDisplay.speedPercentTo(80, 300);
-                            } else {
-                                differenceDisplay.speedPercentTo(20, 300);
-                            }
-                        } else {
-                            if (diff > 0) {
-                                differenceDisplay.speedPercentTo(90, 300);
-                            } else {
-                                differenceDisplay.speedPercentTo(10, 300);
-                            }
-                        }
+                        setDisplay(diff);
                         //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
                         octive.setText("" + getOctive(pitchInHz));
                         cr_scale.setRotation(getRotationAngle(findNote(roundPitch(lastPitch, pitchInHz))));
@@ -155,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                             tuneProgressBar.speedPercentTo(0, 1000);
                             progressBarTimer = 1;
                         }
-                        Log.d("tag", "" + findNote(roundPitch(lastPitch, pitchInHz)));
+                        Log.d("tag", "" + findScaledDiff(roundPitch(lastPitch, pitchInHz)));
                     }
                 });
             }
@@ -174,7 +148,37 @@ public class MainActivity extends AppCompatActivity {
         octive = findViewById(R.id.octiveDisplay);
     }
 
-    private int getOctive(double f) {
+    private void setDisplay(double diff) {
+        if (Math.abs(diff) <= 1) {
+            differenceDisplay.speedPercentTo(50, 300);
+        } else if (Math.abs(diff) <= 2) {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(60, 300);
+            } else {
+                differenceDisplay.speedPercentTo(40, 300);
+            }
+        } else if (Math.abs(diff) <= 3) {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(70, 300);
+            } else {
+                differenceDisplay.speedPercentTo(30, 300);
+            }
+        } else if (Math.abs(diff) <= 4) {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(80, 300);
+            } else {
+                differenceDisplay.speedPercentTo(20, 300);
+            }
+        } else {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(90, 300);
+            } else {
+                differenceDisplay.speedPercentTo(10, 300);
+            }
+        }
+    }
+
+    private String getOctive(double f) {
         double minDifference = 10;
         int index = 0;
         if (f!= -1) {
@@ -184,53 +188,52 @@ public class MainActivity extends AppCompatActivity {
                     index = i;
                 }
             }
+            if (index <= 11) {
+                return "8";
+            } else if (index <= 11+12) {
+                return "7";
+            } else if (index <= 11+12*2) {
+                return "6";
+            } else if (index <= 11+12*3) {
+                return "5";
+            } else if (index <= 11+12*4) {
+                return "4";
+            } else if (index <= 11+12*5) {
+                return "3";
+            } else if (index <= 11+12*6) {
+                return "2";
+            } else if (index <= 11+12*7) {
+                return "1";
+            }
         }
-        if (index <= 11) {
-            return 8;
-        } else if (index <= 11+12) {
-            return 7;
-        } else if (index <= 11+12*2) {
-            return 6;
-        } else if (index <= 11+12*3) {
-            return 5;
-        } else if (index <= 11+12*4) {
-            return 4;
-        } else if (index <= 11+12*5) {
-            return 3;
-        } else if (index <= 11+12*6) {
-            return 2;
-        } else if (index <= 11+12*7) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return " ";
     }
 
     private float getRotationAngle(String note) {
         if (note.equals("C")) {
-            return 90;
-        } else if (note.equals("C♯")) {
-            return 60;
-        } else if (note.equals("D")) {
-            return 30;
-        } else if (note.equals("E♭")) {
             return 0;
-        } else if (note.equals("E")) {
+        } else if (note.equals("C♯")) {
             return -30;
-        } else if (note.equals("F")) {
+        } else if (note.equals("D")) {
             return -60;
-        } else if (note.equals("F♯")) {
+        } else if (note.equals("E♭")) {
             return -90;
-        } else if (note.equals("G")) {
+        } else if (note.equals("E")) {
             return -120;
-        } else if (note.equals("G♯")) {
+        } else if (note.equals("F")) {
             return -150;
-        } else if (note.equals("A")) {
+        } else if (note.equals("F♯")) {
             return 180;
-        } else if (note.equals("B♭")) {
+        } else if (note.equals("G")) {
             return 150;
-        } else {
+        } else if (note.equals("G♯")) {
             return 120;
+        } else if (note.equals("A")) {
+            return 90;
+        } else if (note.equals("B♭")) {
+            return 60;
+        } else {
+            return 30;
         }
     }
 
