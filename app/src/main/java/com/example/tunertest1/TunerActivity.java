@@ -168,7 +168,7 @@ public class TunerActivity extends AppCompatActivity {
                         if (pitchInHz == -1) {
                             pitchTimer++;
                         }
-                        double diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
+                        int diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
                         setDisplay(diff);
                         //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
                         octive.setText("" + getOctive(pitchInHz));
@@ -200,9 +200,49 @@ public class TunerActivity extends AppCompatActivity {
         octive.setVisibility(View.INVISIBLE);
 
         notePicker.setVisibility(View.VISIBLE);
+
+        PitchDetectionHandler pdh = new PitchDetectionHandler() {
+            @Override
+            public void handlePitch(PitchDetectionResult result, AudioEvent e) {
+                final float pitchInHz = result.getPitch();
+                final int selectedNoteIndex = notePicker.getCurrentItemPosition();
+                final String selectedNoteName = notes.get(selectedNoteIndex);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //display.setText("" + findNote(pitchInHz));
+                        if (pitchTimer == 3) {
+                            lastPitch = pitchInHz;
+                            pitchTimer = 0;
+                        }
+                        if (pitchInHz == -1) {
+                            pitchTimer++;
+                        }
+                        int diff = findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName);
+                        setDisplay2(diff);
+                        if (Math.abs(findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName)) <= 3
+                                && progressBarTimer < 50) {
+                            tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                            progressBarTimer++;
+                            if (tuneProgressBar.getCurrentSpeed() >= 90) {
+                                Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            tuneProgressBar.speedPercentTo(0, 1000);
+                            progressBarTimer = 1;
+                        }
+                        //Log.d("tag", "" + findScaledDiff2(roundPitch(lastPitch, pitchInHz)));
+                        Log.d("tag", "" + selectedNoteName);
+                    }
+                });
+            }
+        };
+        AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
+        dispatcher.addAudioProcessor(p);
+        new Thread(dispatcher,"Audio Dispatcher").start();
     }
 
-    private void setDisplay(double diff) {
+    private void setDisplay(int diff) {
         if (Math.abs(diff) <= 1) {
             differenceDisplay.speedPercentTo(50, 300);
         } else if (Math.abs(diff) <= 2) {
@@ -218,6 +258,36 @@ public class TunerActivity extends AppCompatActivity {
                 differenceDisplay.speedPercentTo(30, 300);
             }
         } else if (Math.abs(diff) <= 4) {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(80, 300);
+            } else {
+                differenceDisplay.speedPercentTo(20, 300);
+            }
+        } else {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(90, 300);
+            } else {
+                differenceDisplay.speedPercentTo(10, 300);
+            }
+        }
+    }
+
+    private void setDisplay2(int diff) {
+        if (Math.abs(diff) <= 3) {
+            differenceDisplay.speedPercentTo(50, 300);
+        } else if (Math.abs(diff) <= 10) {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(60, 300);
+            } else {
+                differenceDisplay.speedPercentTo(40, 300);
+            }
+        } else if (Math.abs(diff) <= 50) {
+            if (diff > 0) {
+                differenceDisplay.speedPercentTo(70, 300);
+            } else {
+                differenceDisplay.speedPercentTo(30, 300);
+            }
+        } else if (Math.abs(diff) <= 100) {
             if (diff > 0) {
                 differenceDisplay.speedPercentTo(80, 300);
             } else {
@@ -354,6 +424,24 @@ public class TunerActivity extends AppCompatActivity {
 
     }
 
+    private int findScaledDiff2(double frequency, String note) {
+        double[] notes = getNoteFrequency(note);
+        double minDiff = 10000;
+        int index = 0;
+        for (int i = 0; i < notes.length; i++) {
+            if (i == 0) {
+                minDiff = Math.abs(frequency-notes[0]);
+            } else {
+                if (Math.abs(frequency-notes[i]) < minDiff) {
+                    minDiff = Math.abs(frequency-notes[i]);
+                    index = i;
+                }
+            }
+        }
+        double targetF = notes[index];
+        return (int)(frequency - targetF);
+    }
+
     private String getNoteName(int index) {
         if (index%12 == 11) {
             return "C";
@@ -380,6 +468,40 @@ public class TunerActivity extends AppCompatActivity {
         } else {
             return "B";
         }
+    }
+
+    private double[] getNoteFrequency(String note) {
+        if (note.equals("B")) {
+            return createNoteFArray(0);
+        } else if (note.equals("B♭")) {
+            return createNoteFArray(1);
+        } else if (note.equals("A")) {
+            return createNoteFArray(2);
+        } else if (note.equals("G♯")) {
+            return createNoteFArray(3);
+        } else if (note.equals("G")) {
+            return createNoteFArray(4);
+        } else if (note.equals("F♯")) {
+            return createNoteFArray(5);
+        } else if (note.equals("F")) {
+            return createNoteFArray(6);
+        } else if (note.equals("E")) {
+            return createNoteFArray(7);
+        } else if (note.equals("E♭")) {
+            return createNoteFArray(8);
+        } else if (note.equals("D")) {
+            return createNoteFArray(9);
+        } else if (note.equals("C♯")) {
+            return createNoteFArray(10);
+        } else {
+            return createNoteFArray(11);
+        }
+    }
+
+    private double[] createNoteFArray(int a) {
+        return new double[] {noteFrequencies[a], noteFrequencies[a+12], noteFrequencies[a+12*2], noteFrequencies[a+12*3],
+                noteFrequencies[a+12*4], noteFrequencies[a+12*5], noteFrequencies[a+12*6],
+                noteFrequencies[a+12*7], noteFrequencies[a+12*8]};
     }
 
 }
