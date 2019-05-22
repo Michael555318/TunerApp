@@ -2,9 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Chromatic Tuner"/>
+        android:id="@+id/theme"
+        android:title="Theme"/>
 
     <item
-        android:title="Guitar Tuner" />
+        android:title="Settings" />
 
 </menu>

@@ -1,11 +1,14 @@
 package com.example.tunertest1;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -35,9 +38,12 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 
 import static com.example.tunertest1.Config.RECORD_PERMISSION;
 import static com.example.tunertest1.Config.noteFrequencies;
+import static com.example.tunertest1.Config.themesArray;
+import static com.example.tunertest1.Config.tunersArray;
 
 public class TunerActivity extends AppCompatActivity {
     //todo: finish menu and stuff: https://developer.android.com/guide/topics/ui/menus.html
+    //todo: test tuners and work on guitar tuner (new activities)
 
     // Widgets
     private SpeedView differenceDisplay;
@@ -47,6 +53,7 @@ public class TunerActivity extends AppCompatActivity {
     private TextView octive;
     private ImageView pointer;
     private Toolbar toolbar;
+    private BottomNavigationView navigation;
 
     private WheelPicker notePicker;
 
@@ -56,6 +63,7 @@ public class TunerActivity extends AppCompatActivity {
     private int pitchTimer = 3;
     AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
     public final static ArrayList<String> notes = new ArrayList<>();
+    private boolean lightThemed = true;
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
@@ -106,6 +114,24 @@ public class TunerActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         startTuner1(dispatcher);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
+                AlertDialog.Builder builder = new AlertDialog.Builder(TunerActivity.this);
+                // 2. Chain together various setter methods to set the dialog characteristics
+                builder.setTitle("Choose a tuner...")
+                        .setItems(tunersArray, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+                            }
+                        });
+                // 3. Get the <code><a href="/reference/android/app/AlertDialog.html">AlertDialog</a></code> from <code><a href="/reference/android/app/AlertDialog.Builder.html#create()">create()</a></code>
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     @Override
@@ -115,20 +141,33 @@ public class TunerActivity extends AppCompatActivity {
         return true;
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.theme) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(TunerActivity.this);
+            builder.setTitle("Choose a theme")
+                    .setSingleChoiceItems(themesArray, 0, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (which == 1) {
+                                lightThemed = false;
+                            } else {
+                                lightThemed = true;
+                            }
+                        }
+                    });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void wireWidgets() {
         differenceDisplay = findViewById(R.id.speedView);
@@ -140,6 +179,7 @@ public class TunerActivity extends AppCompatActivity {
         notePicker = findViewById(R.id.notePicker);
         setUpNotePicker();
         toolbar = findViewById(R.id.toolbar);
+        navigation = findViewById(R.id.navigation);
     }
 
     private void setUpNotePicker() {
@@ -517,6 +557,22 @@ public class TunerActivity extends AppCompatActivity {
         return new double[] {noteFrequencies[a], noteFrequencies[a+12], noteFrequencies[a+12*2], noteFrequencies[a+12*3],
                 noteFrequencies[a+12*4], noteFrequencies[a+12*5], noteFrequencies[a+12*6],
                 noteFrequencies[a+12*7], noteFrequencies[a+12*8]};
+    }
+
+    //todo: finish set up light theme and dark theme
+
+    private void setUpLightTheme() {
+        toolbar.setBackgroundColor(getResources().getColor(R.color.colorLightPrimary));
+        navigation.setBackgroundColor(Color.WHITE);
+        differenceDisplay.setCenterCircleColor(Color.GRAY);
+        differenceDisplay.setIndicatorColor(Color.BLUE);
+    }
+
+    private void setUpDarkTheme() {
+        toolbar.setBackgroundColor(getResources().getColor(R.color.colorDarkPrimary));
+        navigation.setBackgroundColor(Color.DKGRAY);
+        differenceDisplay.setCenterCircleColor(Color.BLUE);
+        differenceDisplay.setIndicatorColor(Color.GREEN);
     }
 
 }

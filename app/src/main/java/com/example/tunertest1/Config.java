@@ -19,4 +19,8 @@ public class Config {
             61.7354, 58.2705, 55.0000, 51.9131, 48.9994, 46.2493, 43.6535, 41.2034, 38.8909, 36.7081, 34.6478, 32.7032,
             30.8677, 29.1352, 27.5000, 25.9565, 24.4997, 23.1247, 21.8268, 20.6017, 19.4454, 18.3540, 17.3239, 16.3516};
 
+    public static final String[] tunersArray = new String[] {"Chromatic Tuner", "Guitar tuner"};
+
+    public static final String[] themesArray = new String[] {"Light theme", "Dark Theme"};
+
 }
