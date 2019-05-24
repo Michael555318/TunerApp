@@ -23,4 +23,6 @@ public class Config {
 
     public static final String[] themesArray = new String[] {"Light theme", "Dark Theme"};
 
+    public static boolean lightThemed = true;
+
 }

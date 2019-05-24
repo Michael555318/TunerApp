@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
+    android:background="#202020"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TunerActivity">
@@ -12,7 +13,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorLightPrimary"
+        android:background="@color/colorDarkPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -24,13 +25,13 @@
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="61dp"
-        android:background="?android:attr/windowBackground"
-        app:itemTextColor="@color/colorLightPrimary"
+        android:background="#4F4C55"
+        app:itemTextColor="#ffffff"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:menu="@menu/navigation" />
+        app:menu="@menu/navigation_dark" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -45,7 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/navigation">
-        
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="30dp" />
@@ -55,9 +56,9 @@
             android:layout_width="match_parent"
             android:layout_height="204dp"
             app:sv_image="@drawable/lime_green"
-            app:sv_speedTextColor="#ffffff"
+            app:sv_speedTextColor="#202020"
             app:sv_speedTextPosition="BOTTOM_CENTER"
-            app:sv_speedometerBackColor="#ffffff"
+            app:sv_speedometerBackColor="#202020"
             app:sv_unit=" " />
 
         <TextView
@@ -82,7 +83,8 @@
             app:sv_speedTextPosition="CENTER"
             app:sv_speedometerWidth="30dp"
             app:sv_startDegree="180"
-            app:sv_textColor="#ffffff"
+            app:sv_textColor="#202020"
+            app:sv_indicatorColor="#7CBDC5"
             app:sv_unit=" " />
 
     </LinearLayout>
@@ -92,7 +94,7 @@
         android:layout_width="312dp"
         android:layout_height="259dp"
         android:layout_marginTop="204dp"
-        android:src="@drawable/cr_wheel"
+        android:src="@drawable/cr_wheel_dark"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toStartOf="@+id/linearLayout"
         app:layout_constraintHorizontal_bias="0.502"
@@ -110,7 +112,7 @@
         android:rotation="180"
         android:scaleX="0.5"
         android:scaleY="0.5"
-        android:src="@drawable/pointer"
+        android:src="@drawable/pointer_dark"
         app:layout_constraintBottom_toBottomOf="@+id/cr_image"
         app:layout_constraintEnd_toEndOf="@+id/cr_image"
         app:layout_constraintHorizontal_bias="0.508"
@@ -124,6 +126,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="88dp"
+        android:textColor="#ffffff"
         app:layout_constraintBottom_toBottomOf="@+id/imageView_arrow"
         app:layout_constraintEnd_toStartOf="@+id/imageView_arrow"
         app:layout_constraintStart_toEndOf="@+id/imageView_arrow"
@@ -141,6 +144,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/navigation"
         app:layout_constraintVertical_bias="0.751" />
-
 
 </android.support.constraint.ConstraintLayout>

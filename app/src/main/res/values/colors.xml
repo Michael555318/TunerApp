@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="colorLightPrimary">#3F51B5</color>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="colorLightPrimary" tools:ignore="MissingDefaultResource">#3F51B5</color>
+    <color name="colorLightPrimaryClicked">#6371BB</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorDarkPrimary">#0b0d18</color>
+    <color name="lightgreen">#0F8700</color>
 </resources>

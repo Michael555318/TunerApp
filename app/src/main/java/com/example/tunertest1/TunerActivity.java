@@ -2,10 +2,12 @@ package com.example.tunertest1;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.solver.widgets.ConstraintWidgetContainer;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +19,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,11 +42,12 @@ import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 
 import static com.example.tunertest1.Config.RECORD_PERMISSION;
+import static com.example.tunertest1.Config.lightThemed;
 import static com.example.tunertest1.Config.noteFrequencies;
 import static com.example.tunertest1.Config.themesArray;
 import static com.example.tunertest1.Config.tunersArray;
 
-public class TunerActivity extends AppCompatActivity {
+public class TunerActivity extends MainActivity {
     //todo: finish menu and stuff: https://developer.android.com/guide/topics/ui/menus.html
     //todo: test tuners and work on guitar tuner (new activities)
 
@@ -54,6 +60,9 @@ public class TunerActivity extends AppCompatActivity {
     private ImageView pointer;
     private Toolbar toolbar;
     private BottomNavigationView navigation;
+    private View container;
+
+    LinearLayout dynamicContent,bottonNavBar;
 
     private WheelPicker notePicker;
 
@@ -61,9 +70,7 @@ public class TunerActivity extends AppCompatActivity {
     private int progressBarTimer = 1;
     private float lastPitch;
     private int pitchTimer = 3;
-    AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
     public final static ArrayList<String> notes = new ArrayList<>();
-    private boolean lightThemed = true;
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
@@ -89,7 +96,7 @@ public class TunerActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    startTuner1(dispatcher);
+                    startTuner1();
                     return true;
                 case R.id.navigation_dashboard:
                     endTuner1();
@@ -102,7 +109,27 @@ public class TunerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tuner);
+        //setContentView(R.layout.activity_tuner);
+        if (lightThemed) {
+            dynamicContent = (LinearLayout)  findViewById(R.id.dynamicContent);
+            bottonNavBar= (LinearLayout) findViewById(R.id.bottonNavBar);
+            RadioGroup radiogroup = (RadioGroup) bottonNavBar.getChildAt(0);
+            radiogroup.getChildAt(1).setBackgroundColor(getResources().getColor(R.color.colorLightPrimaryClicked));
+            radiogroup.getChildAt(0).setBackgroundColor(getResources().getColor(R.color.colorLightPrimary));
+            View wizard = getLayoutInflater().inflate(R.layout.activity_tuner, null);
+            dynamicContent.addView(wizard);
+
+            RadioGroup rg=(RadioGroup)findViewById(R.id.radioGroup1);
+            RadioButton rb=(RadioButton)findViewById(R.id.tuner);
+        } else {
+            dynamicContent = (LinearLayout)  findViewById(R.id.dynamicContent);
+            bottonNavBar= (LinearLayout) findViewById(R.id.bottonNavBar);
+            View wizard = getLayoutInflater().inflate(R.layout.activity_tuner_dark, null);
+            dynamicContent.addView(wizard);
+
+            RadioGroup rg=(RadioGroup)findViewById(R.id.radioGroup1);
+            RadioButton rb=(RadioButton)findViewById(R.id.tuner);
+        }
 
         ActivityCompat.requestPermissions(this, permissions,
                 RECORD_PERMISSION);
@@ -113,7 +140,7 @@ public class TunerActivity extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        startTuner1(dispatcher);
+        startTuner1();
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,19 +176,37 @@ public class TunerActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.theme) {
+        if (item.getTitle().equals("Theme")) {
             AlertDialog.Builder builder = new AlertDialog.Builder(TunerActivity.this);
-            builder.setTitle("Choose a theme")
-                    .setSingleChoiceItems(themesArray, 0, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (which == 1) {
-                                lightThemed = false;
-                            } else {
-                                lightThemed = true;
+            if (lightThemed) {
+                builder.setTitle("Choose a theme")
+                        .setSingleChoiceItems(themesArray, 0, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == 1) {
+                                    lightThemed = false;
+                                } else {
+                                    lightThemed = true;
+                                }
+                                Intent restart = new Intent(TunerActivity.this, TunerActivity.class);
+                                startActivity(restart);
                             }
-                        }
-                    });
+                        });
+            } else {
+                builder.setTitle("Choose a theme")
+                        .setSingleChoiceItems(themesArray, 1, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == 1) {
+                                    lightThemed = false;
+                                } else {
+                                    lightThemed = true;
+                                }
+                                Intent restart = new Intent(TunerActivity.this, TunerActivity.class);
+                                startActivity(restart);
+                            }
+                        });
+            }
             AlertDialog dialog = builder.create();
             dialog.show();
 
@@ -180,6 +225,7 @@ public class TunerActivity extends AppCompatActivity {
         setUpNotePicker();
         toolbar = findViewById(R.id.toolbar);
         navigation = findViewById(R.id.navigation);
+        container = findViewById(R.id.container);
     }
 
     private void setUpNotePicker() {
@@ -201,13 +247,14 @@ public class TunerActivity extends AppCompatActivity {
         notePicker.setIndicator(true);
     }
 
-    private void startTuner1(AudioDispatcher dispatcher) {
+    private void startTuner1() {
         cr_scale.setVisibility(View.VISIBLE);
         pointer.setVisibility(View.VISIBLE);
         octive.setVisibility(View.VISIBLE);
 
         notePicker.setVisibility(View.INVISIBLE);
 
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
@@ -256,6 +303,7 @@ public class TunerActivity extends AppCompatActivity {
 
         notePicker.setVisibility(View.VISIBLE);
 
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
@@ -557,22 +605,6 @@ public class TunerActivity extends AppCompatActivity {
         return new double[] {noteFrequencies[a], noteFrequencies[a+12], noteFrequencies[a+12*2], noteFrequencies[a+12*3],
                 noteFrequencies[a+12*4], noteFrequencies[a+12*5], noteFrequencies[a+12*6],
                 noteFrequencies[a+12*7], noteFrequencies[a+12*8]};
-    }
-
-    //todo: finish set up light theme and dark theme
-
-    private void setUpLightTheme() {
-        toolbar.setBackgroundColor(getResources().getColor(R.color.colorLightPrimary));
-        navigation.setBackgroundColor(Color.WHITE);
-        differenceDisplay.setCenterCircleColor(Color.GRAY);
-        differenceDisplay.setIndicatorColor(Color.BLUE);
-    }
-
-    private void setUpDarkTheme() {
-        toolbar.setBackgroundColor(getResources().getColor(R.color.colorDarkPrimary));
-        navigation.setBackgroundColor(Color.DKGRAY);
-        differenceDisplay.setCenterCircleColor(Color.BLUE);
-        differenceDisplay.setIndicatorColor(Color.GREEN);
     }
 
 }
