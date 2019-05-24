@@ -367,7 +367,7 @@ public class MetronomeActivity extends MainActivity {
                 countdown.cancel();
                 soundPool.autoPause();
 
-                layout.setBackgroundColor(Color.parseColor("#000000"));
+                layout.setBackgroundColor(Color.parseColor("#202020"));
                 bpm.setTextColor(Color.parseColor("#8fff3a"));
                 beatdisplay.setTextColor(Color.parseColor("#8fff3a"));
                 offbeats.setTextColor(Color.parseColor("#8fff3a"));

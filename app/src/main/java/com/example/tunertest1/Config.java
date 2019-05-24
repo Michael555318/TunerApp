@@ -2,6 +2,9 @@ package com.example.tunertest1;
 
 import java.util.ArrayList;
 
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+
 public class Config {
 
     public final static int RECORD_PERMISSION = 100;
@@ -23,6 +26,13 @@ public class Config {
 
     public static final String[] themesArray = new String[] {"Light theme", "Dark Theme"};
 
+    public static final String[] guitarTuningArray = new String[] {"Standard: E A D G B E", "Open G: D G D G B D", "Open D: D A D F♯ A D",
+            "Drop D: D A D G B E", "Open E: E B E G♯ B E", "Half Step Down: D♯, G♯, C♯, F♯, A♯, D♯"};
+
+    public static AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
+
     public static boolean lightThemed = true;
+
+    //https://en.wikipedia.org/wiki/List_of_guitar_tunings
 
 }

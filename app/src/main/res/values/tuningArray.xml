@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="planets_array">
+        <item>Standard: E A D G B E</item>
+        <item>Open G: D G D G B D</item>
+        <item>Open D: D A D F♯ A D</item>
+        <item>Drop D: D A D G B E</item>
+        <item>Open E: E B E G♯ B E</item>
+        <item>Half Step Down: D♯, G♯, C♯, F♯, A♯, D♯</item>
+        <item>Dad Gad: D A D G A D</item>
+    </string-array>
+</resources>

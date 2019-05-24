@@ -6,4 +6,40 @@
     android:layout_height="match_parent"
     tools:context=".GuitarTunerActivity">
 
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorLightPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_menu" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <com.github.anastr.speedviewlib.ImageLinearGauge
+        android:id="@+id/tuneProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner"
+        app:sv_image="@drawable/lime_green"
+        app:sv_speedTextColor="#ffffff"
+        app:sv_speedTextPosition="BOTTOM_CENTER"
+        app:sv_speedometerBackColor="#ffffff"
+        app:sv_unit=" " />
+
 </android.support.constraint.ConstraintLayout>

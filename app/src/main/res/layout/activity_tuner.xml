@@ -35,7 +35,7 @@
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="415dp"
-        android:layout_height="632dp"
+        android:layout_height="546dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="18dp"
@@ -45,10 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/navigation">
-        
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="30dp" />
+
 
         <com.github.anastr.speedviewlib.ImageLinearGauge
             android:id="@+id/tuneProgressBar"
@@ -59,14 +56,10 @@
             app:sv_speedTextPosition="BOTTOM_CENTER"
             app:sv_speedometerBackColor="#ffffff"
             app:sv_unit=" " />
-
+        
         <TextView
-            android:id="@+id/textiew_displayNote"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="50dp" />
+            android:layout_height="20dp" />
 
         <com.github.anastr.speedviewlib.SpeedView
             android:id="@+id/speedView"
