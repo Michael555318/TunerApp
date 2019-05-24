@@ -9,18 +9,26 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toolbar;
+
+import com.github.anastr.speedviewlib.ImageLinearGauge;
 
 import static com.example.tunertest1.Config.lightThemed;
 import static com.example.tunertest1.Config.themesArray;
+import static com.example.tunertest1.Config.tunersArray;
 
-public class GuitarTunerActivity extends AppCompatActivity {
+public class GuitarTunerActivity extends MainActivity {
 
     LinearLayout dynamicContent,bottonNavBar;
     android.support.v7.widget.Toolbar toolbar;
+
+    private Spinner spinner;
+    private ImageLinearGauge tuneProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +47,27 @@ public class GuitarTunerActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
+                AlertDialog.Builder builder = new AlertDialog.Builder(GuitarTunerActivity.this);
+                // 2. Chain together various setter methods to set the dialog characteristics
+                builder.setTitle("Choose a tuner...")
+                        .setItems(tunersArray, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (which == 0) {
+                                    //tunerThread.interrupt();
+                                    Intent startTuner = new Intent(getBaseContext(), TunerActivity.class);
+                                    startActivity(startTuner);
+                                }
+                            }
+                        });
+                // 3. Get the <code><a href="/reference/android/app/AlertDialog.html">AlertDialog</a></code> from <code><a href="/reference/android/app/AlertDialog.Builder.html#create()">create()</a></code>
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     @Override
@@ -97,6 +125,15 @@ public class GuitarTunerActivity extends AppCompatActivity {
 
     private void wireWidgets() {
         toolbar = findViewById(R.id.toolbar);
+        tuneProgressBar = findViewById(R.id.tuneProgressBar);
+        spinner = findViewById(R.id.spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.planets_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
     }
 
 }
