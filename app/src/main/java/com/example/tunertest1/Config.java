@@ -2,6 +2,9 @@ package com.example.tunertest1;
 
 import java.util.ArrayList;
 
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.io.android.AudioDispatcherFactory;
+
 public class Config {
 
     public final static int RECORD_PERMISSION = 100;
@@ -22,6 +25,8 @@ public class Config {
     public static final String[] tunersArray = new String[] {"Chromatic Tuner", "Guitar tuner"};
 
     public static final String[] themesArray = new String[] {"Light theme", "Dark Theme"};
+
+    public static AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
 
     public static boolean lightThemed = true;
 

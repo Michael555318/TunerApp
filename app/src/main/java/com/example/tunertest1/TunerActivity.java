@@ -42,6 +42,7 @@ import be.tarsos.dsp.pitch.PitchDetectionResult;
 import be.tarsos.dsp.pitch.PitchProcessor;
 
 import static com.example.tunertest1.Config.RECORD_PERMISSION;
+import static com.example.tunertest1.Config.dispatcher;
 import static com.example.tunertest1.Config.lightThemed;
 import static com.example.tunertest1.Config.noteFrequencies;
 import static com.example.tunertest1.Config.themesArray;
@@ -61,6 +62,7 @@ public class TunerActivity extends MainActivity {
     private Toolbar toolbar;
     private BottomNavigationView navigation;
     private View container;
+    private Thread tunerThread;
 
     LinearLayout dynamicContent,bottonNavBar;
 
@@ -153,8 +155,11 @@ public class TunerActivity extends MainActivity {
                 builder.setTitle("Choose a tuner...")
                         .setItems(tunersArray, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
+                                if (which == 1) {
+                                    tunerThread.interrupt();
+                                    Intent startGuitarTuner = new Intent(TunerActivity.this, GuitarTunerActivity.class);
+                                    startActivity(startGuitarTuner);
+                                }
                             }
                         });
                 // 3. Get the <code><a href="/reference/android/app/AlertDialog.html">AlertDialog</a></code> from <code><a href="/reference/android/app/AlertDialog.Builder.html#create()">create()</a></code>
@@ -191,7 +196,8 @@ public class TunerActivity extends MainActivity {
                                 } else {
                                     lightThemed = true;
                                 }
-                                Intent restart = new Intent(TunerActivity.this, TunerActivity.class);
+                                tunerThread.interrupt();
+                                Intent restart = new Intent(getBaseContext(), TunerActivity.class);
                                 startActivity(restart);
                             }
                         });
@@ -205,7 +211,8 @@ public class TunerActivity extends MainActivity {
                                 } else {
                                     lightThemed = true;
                                 }
-                                Intent restart = new Intent(TunerActivity.this, TunerActivity.class);
+                                tunerThread.interrupt();
+                                Intent restart = new Intent(getBaseContext(), TunerActivity.class);
                                 startActivity(restart);
                             }
                         });
@@ -257,7 +264,6 @@ public class TunerActivity extends MainActivity {
 
         notePicker.setVisibility(View.INVISIBLE);
 
-        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
@@ -296,7 +302,8 @@ public class TunerActivity extends MainActivity {
         };
         AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
         dispatcher.addAudioProcessor(p);
-        new Thread(dispatcher,"Audio Dispatcher").start();
+        tunerThread = new Thread(dispatcher,"Audio Dispatcher");
+        tunerThread.start();
     }
 
     private void endTuner1() {
@@ -305,8 +312,8 @@ public class TunerActivity extends MainActivity {
         octive.setVisibility(View.INVISIBLE);
 
         notePicker.setVisibility(View.VISIBLE);
+        tunerThread.interrupt();
 
-        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(22050,1024,0);
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
@@ -345,7 +352,8 @@ public class TunerActivity extends MainActivity {
         };
         AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
         dispatcher.addAudioProcessor(p);
-        new Thread(dispatcher,"Audio Dispatcher").start();
+        tunerThread = new Thread(dispatcher,"Audio Dispatcher");
+        tunerThread.start();
     }
 
     private void setDisplay(int diff) {
