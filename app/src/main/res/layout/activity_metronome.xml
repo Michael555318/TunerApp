@@ -4,314 +4,154 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#202020"
+    android:background="@color/white"
     tools:context=".MetronomeActivity">
 
-    <!--<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-        <!--android:id="@+id/toolbar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@color/colorLightPrimary"-->
-        <!--android:theme="@style/ThemeOverlay.AppCompat.Dark"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintHorizontal_bias="1.0"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent" />-->
-
     <Button
-
         android:id="@+id/button_main_stop"
-
-        android:layout_width="119dp"
-
+        android:layout_width="123dp"
         android:layout_height="52dp"
-
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="140dp"
-
         android:background="@drawable/buttonshape_startstop"
 
-        android:shadowColor="#0F8700"
-
-        android:shadowDx="0"
-
-        android:shadowDy="0"
-
-        android:shadowRadius="5"
-
         android:text="Stop"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent"
-
-        app:layout_constraintHorizontal_bias="0.792"
-
         app:layout_constraintStart_toStartOf="parent" />
 
-
     <EditText
-
         android:id="@+id/editText_main_bpm"
-
         android:layout_width="wrap_content"
-
         android:layout_height="wrap_content"
-
         android:ems="10"
-
-        android:fadingEdge="horizontal|vertical"
-
         android:fontFamily="sans-serif-condensed"
-
         android:hint="ENTER BPM"
-
         android:inputType="number"
-
         android:textAlignment="center"
-
-        android:textColor="@color/lightgreen"
-
-        android:textColorHint="@color/lightgreen"
-
+        android:textColor="@color/red"
         android:typeface="serif"
-
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintHorizontal_bias="0.502"
-
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.531" />
 
-
-
     <Button
-
         android:id="@+id/button_main_start"
-
         android:layout_width="123dp"
-
         android:layout_height="52dp"
-
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="140dp"
-
         android:background="@drawable/buttonshape_startstop"
 
-        android:shadowColor="#0F8700"
-
-        android:shadowDx="0"
-
-        android:shadowDy="0"
-
-        android:shadowRadius="5"
-
         android:text="Start"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent"
-
-        app:layout_constraintHorizontal_bias="0.206"
-
         app:layout_constraintStart_toStartOf="parent" />
-
-
 
     <TextView
-
         android:id="@+id/textView_main_beatnum"
-
         android:layout_width="338dp"
-
         android:layout_height="207dp"
-
         android:layout_marginTop="40dp"
-
         android:textAlignment="center"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
         android:textSize="160sp"
-
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintStart_toStartOf="parent"
-
         app:layout_constraintTop_toTopOf="parent"
-
         tools:text="1" />
 
-
-
     <CheckBox
-
         android:id="@+id/checkBox_main_offbeats"
-
         android:layout_width="wrap_content"
-
         android:layout_height="41dp"
-
         android:layout_marginBottom="64dp"
-
         android:text="Offbeats"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintHorizontal_bias="0.121"
-
         app:layout_constraintStart_toStartOf="parent" />
 
-
-
     <CheckBox
-
         android:id="@+id/checkBox_main_efirst"
-
         android:layout_width="wrap_content"
-
         android:layout_height="44dp"
-
         android:layout_marginBottom="64dp"
-
         android:layout_marginEnd="136dp"
-
         android:text="Emphasize First"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent" />
 
-
-
     <CheckBox
-
         android:id="@+id/checkBox_main_hidecounts"
-
         android:layout_width="wrap_content"
-
         android:layout_height="wrap_content"
-
         android:layout_marginBottom="24dp"
-
         android:layout_marginEnd="8dp"
-
         android:layout_marginStart="8dp"
-
         android:text="Hide Counts"
-
         android:textAlignment="center"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintStart_toStartOf="parent" />
 
-
-
     <CheckBox
-
         android:id="@+id/checkBox_main_cats"
-
         android:layout_width="86dp"
-
         android:layout_height="25dp"
-
         android:layout_marginBottom="28dp"
-
         android:layout_marginEnd="32dp"
-
         android:text="Cats?!"
-
         android:textAlignment="viewStart"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent" />
 
-
-
     <CheckBox
-
         android:id="@+id/checkBox_main_firstonly"
-
         android:layout_width="wrap_content"
-
         android:layout_height="wrap_content"
-
         android:layout_marginBottom="24dp"
-
         android:layout_marginStart="36dp"
-
         android:text="First Only"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintStart_toStartOf="parent" />
-
 
     <RelativeLayout
-
         android:id="@+id/the_id"
-
         android:layout_width="620dp"
-
         android:layout_height="698dp"
-
         android:layout_marginStart="16dp"
-
         android:layout_marginTop="8dp"
-
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintHorizontal_bias="0.531"
-
         app:layout_constraintStart_toStartOf="parent"
-
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.52" />
 
-
-
     <CheckBox
-
         android:id="@+id/checkBox_main_flash"
-
         android:layout_width="80dp"
-
         android:layout_height="41dp"
-
         android:layout_marginBottom="64dp"
-
         android:layout_marginEnd="40dp"
-
         android:text="Flash"
-
-        android:textColor="@color/lightgreen"
-
+        android:textColor="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
