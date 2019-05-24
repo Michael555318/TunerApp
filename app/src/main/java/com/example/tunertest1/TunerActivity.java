@@ -124,6 +124,9 @@ public class TunerActivity extends MainActivity {
         } else {
             dynamicContent = (LinearLayout)  findViewById(R.id.dynamicContent);
             bottonNavBar= (LinearLayout) findViewById(R.id.bottonNavBar);
+            RadioGroup radiogroup = (RadioGroup) bottonNavBar.getChildAt(0);
+            radiogroup.getChildAt(1).setBackgroundColor(getResources().getColor(R.color.colorLightPrimaryClicked));
+            radiogroup.getChildAt(0).setBackgroundColor(getResources().getColor(R.color.colorLightPrimary));
             View wizard = getLayoutInflater().inflate(R.layout.activity_tuner_dark, null);
             dynamicContent.addView(wizard);
 
