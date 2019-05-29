@@ -63,6 +63,7 @@ public class TunerActivity extends MainActivity {
     private BottomNavigationView navigation;
     private View container;
     private Thread tunerThread;
+    private boolean tuner1 = true;
 
     LinearLayout dynamicContent,bottonNavBar;
 
@@ -98,10 +99,20 @@ public class TunerActivity extends MainActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    startTuner1();
+                    tuner1 = true;
+                    cr_scale.setVisibility(View.VISIBLE);
+                    pointer.setVisibility(View.VISIBLE);
+                    octive.setVisibility(View.VISIBLE);
+
+                    notePicker.setVisibility(View.INVISIBLE);
                     return true;
                 case R.id.navigation_dashboard:
-                    endTuner1();
+                    tuner1 = false;
+                    cr_scale.setVisibility(View.INVISIBLE);
+                    pointer.setVisibility(View.INVISIBLE);
+                    octive.setVisibility(View.INVISIBLE);
+
+                    notePicker.setVisibility(View.VISIBLE);
                     return true;
             }
             return false;
@@ -156,7 +167,7 @@ public class TunerActivity extends MainActivity {
                         .setItems(tunersArray, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (which == 1) {
-                                    tunerThread.interrupt();
+                                    //tunerThread.interrupt();
                                     Intent startGuitarTuner = new Intent(TunerActivity.this, GuitarTunerActivity.class);
                                     startActivity(startGuitarTuner);
                                 }
@@ -167,6 +178,12 @@ public class TunerActivity extends MainActivity {
                 dialog.show();
             }
         });
+
+        cr_scale.setVisibility(View.VISIBLE);
+        pointer.setVisibility(View.VISIBLE);
+        octive.setVisibility(View.VISIBLE);
+
+        notePicker.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -196,7 +213,7 @@ public class TunerActivity extends MainActivity {
                                 } else {
                                     lightThemed = true;
                                 }
-                                tunerThread.interrupt();
+                                //tunerThread.interrupt();
                                 Intent restart = new Intent(getBaseContext(), TunerActivity.class);
                                 startActivity(restart);
                             }
@@ -211,7 +228,7 @@ public class TunerActivity extends MainActivity {
                                 } else {
                                     lightThemed = true;
                                 }
-                                tunerThread.interrupt();
+                                //tunerThread.interrupt();
                                 Intent restart = new Intent(getBaseContext(), TunerActivity.class);
                                 startActivity(restart);
                             }
@@ -258,62 +275,6 @@ public class TunerActivity extends MainActivity {
     }
 
     private void startTuner1() {
-        cr_scale.setVisibility(View.VISIBLE);
-        pointer.setVisibility(View.VISIBLE);
-        octive.setVisibility(View.VISIBLE);
-
-        notePicker.setVisibility(View.INVISIBLE);
-
-        PitchDetectionHandler pdh = new PitchDetectionHandler() {
-            @Override
-            public void handlePitch(PitchDetectionResult result, AudioEvent e) {
-                final float pitchInHz = result.getPitch();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //display.setText("" + findNote(pitchInHz));
-                        if (pitchTimer == 3) {
-                            lastPitch = pitchInHz;
-                            pitchTimer = 0;
-                        }
-                        if (pitchInHz == -1) {
-                            pitchTimer++;
-                        }
-                        int diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
-                        setDisplay(diff);
-                        //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
-                        octive.setText("" + getOctive(pitchInHz));
-                        cr_scale.setRotation(getRotationAngle(findNote(roundPitch(lastPitch, pitchInHz))));
-                        if (Math.abs(findScaledDiff(roundPitch(lastPitch, pitchInHz))) <= 1
-                                && progressBarTimer < 50) {
-                            tuneProgressBar.speedPercentTo(progressBarTimer*6);
-                            progressBarTimer++;
-                            if (tuneProgressBar.getCurrentSpeed() >= 90) {
-                                Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            tuneProgressBar.speedPercentTo(0, 1000);
-                            progressBarTimer = 1;
-                        }
-                        //Log.d("tag", "" + findScaledDiff(roundPitch(lastPitch, pitchInHz)));
-                    }
-                });
-            }
-        };
-        AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
-        dispatcher.addAudioProcessor(p);
-        tunerThread = new Thread(dispatcher,"Audio Dispatcher");
-        tunerThread.start();
-    }
-
-    private void endTuner1() {
-        cr_scale.setVisibility(View.INVISIBLE);
-        pointer.setVisibility(View.INVISIBLE);
-        octive.setVisibility(View.INVISIBLE);
-
-        notePicker.setVisibility(View.VISIBLE);
-        tunerThread.interrupt();
-
         PitchDetectionHandler pdh = new PitchDetectionHandler() {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
@@ -324,28 +285,56 @@ public class TunerActivity extends MainActivity {
                     @Override
                     public void run() {
                         //display.setText("" + findNote(pitchInHz));
-                        if (pitchTimer == 3) {
-                            lastPitch = pitchInHz;
-                            pitchTimer = 0;
-                        }
-                        if (pitchInHz == -1) {
-                            pitchTimer++;
-                        }
-                        int diff = findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName);
-                        setDisplay2(diff);
-                        if (Math.abs(findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName)) <= 3
-                                && progressBarTimer < 50) {
-                            tuneProgressBar.speedPercentTo(progressBarTimer*6);
-                            progressBarTimer++;
-                            if (tuneProgressBar.getCurrentSpeed() >= 90) {
-                                Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                        if (tuner1) {
+                            if (pitchTimer == 3) {
+                                lastPitch = pitchInHz;
+                                pitchTimer = 0;
                             }
+                            if (pitchInHz == -1) {
+                                pitchTimer++;
+                            }
+                            int diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
+                            setDisplay(diff);
+                            //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
+                            octive.setText("" + getOctive(pitchInHz));
+                            cr_scale.setRotation(getRotationAngle(findNote(roundPitch(lastPitch, pitchInHz))));
+                            if (Math.abs(findScaledDiff(roundPitch(lastPitch, pitchInHz))) <= 1
+                                    && progressBarTimer < 50) {
+                                tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                                progressBarTimer++;
+                                if (tuneProgressBar.getCurrentSpeed() >= 90) {
+                                    Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                tuneProgressBar.speedPercentTo(0, 1000);
+                                progressBarTimer = 1;
+                            }
+                            //Log.d("tag", "" + findScaledDiff(roundPitch(lastPitch, pitchInHz)));
                         } else {
-                            tuneProgressBar.speedPercentTo(0, 1000);
-                            progressBarTimer = 1;
+                            //display.setText("" + findNote(pitchInHz));
+                            if (pitchTimer == 3) {
+                                lastPitch = pitchInHz;
+                                pitchTimer = 0;
+                            }
+                            if (pitchInHz == -1) {
+                                pitchTimer++;
+                            }
+                            int diff = findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName);
+                            setDisplay2(diff);
+                            if (Math.abs(findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName)) <= 3
+                                    && progressBarTimer < 50) {
+                                tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                                progressBarTimer++;
+                                if (tuneProgressBar.getCurrentSpeed() >= 90) {
+                                    Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                tuneProgressBar.speedPercentTo(0, 1000);
+                                progressBarTimer = 1;
+                            }
+                            //Log.d("tag", "" + findScaledDiff2(roundPitch(lastPitch, pitchInHz)));
+                            //Log.d("tag", "" + selectedNoteName);
                         }
-                        //Log.d("tag", "" + findScaledDiff2(roundPitch(lastPitch, pitchInHz)));
-                        Log.d("tag", "" + selectedNoteName);
                     }
                 });
             }
