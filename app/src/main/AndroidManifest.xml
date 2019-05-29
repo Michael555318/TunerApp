@@ -20,14 +20,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MetronomeActivity" />
+        <activity android:name=".MetronomeActivity"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".GuitarTunerActivity"
-            android:label="Guitar Tuner">
+            android:label="Guitar Tuner"
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".TunerActivity"
-            android:label="Chromatic Tuner">
+            android:label="Chromatic Tuner"
+            android:launchMode="singleTask">
         </activity>
     </application>
 
