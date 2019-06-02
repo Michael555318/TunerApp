@@ -18,10 +18,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,33 +51,43 @@ import static com.example.tunertest1.Config.lightThemed;
 import static com.example.tunertest1.Config.noteFrequencies;
 import static com.example.tunertest1.Config.themesArray;
 import static com.example.tunertest1.Config.tunersArray;
+import static com.example.tunertest1.Config.tuning0;
+import static com.example.tunertest1.Config.tuning1;
+import static com.example.tunertest1.Config.tuning2;
+import static com.example.tunertest1.Config.tuning3;
+import static com.example.tunertest1.Config.tuning4;
+import static com.example.tunertest1.Config.tuning5;
 
-public class TunerActivity extends MainActivity {
-    //todo: finish menu and stuff: https://developer.android.com/guide/topics/ui/menus.html
-    //todo: test tuners and work on guitar tuner (new activities)
+public class TunerActivity extends MainActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener{
 
     // Widgets
     private SpeedView differenceDisplay;
-    private TextView displayNote;
     private ImageLinearGauge tuneProgressBar;
     private ImageView cr_scale;
     private TextView octive;
     private ImageView pointer;
     private Toolbar toolbar;
     private BottomNavigationView navigation;
-    private View container;
     private Thread tunerThread;
-    private boolean tuner1 = true;
-
     LinearLayout dynamicContent,bottonNavBar;
-
     private WheelPicker notePicker;
+    private Spinner spinner;
+    private TextView display;
+    private LinearLayout notesDisplay;
+    private Button button1, button2, button3, button4, button5, button6;
 
     // Tools
     private int progressBarTimer = 1;
     private float lastPitch;
     private int pitchTimer = 3;
     public final static ArrayList<String> notes = new ArrayList<>();
+    private int tuner1 = 1; //tuner1 = 1 -> Chromatic Tuner 1
+                            //       = 2 -> Chromatic Tuner 2
+                            //       = 3 -> Guitar Tuner
+                            private int tuning = 0;
+    double tuningF = 0;
+    int tuningIndex = 0;
+    boolean[] tuned = new boolean[] {false, false, false, false, false, false};
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
@@ -99,20 +113,12 @@ public class TunerActivity extends MainActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    tuner1 = true;
-                    cr_scale.setVisibility(View.VISIBLE);
-                    pointer.setVisibility(View.VISIBLE);
-                    octive.setVisibility(View.VISIBLE);
-
-                    notePicker.setVisibility(View.INVISIBLE);
+                    tuner1 = 1;
+                    tunersSetUp(tuner1);
                     return true;
                 case R.id.navigation_dashboard:
-                    tuner1 = false;
-                    cr_scale.setVisibility(View.INVISIBLE);
-                    pointer.setVisibility(View.INVISIBLE);
-                    octive.setVisibility(View.INVISIBLE);
-
-                    notePicker.setVisibility(View.VISIBLE);
+                    tuner1 = 2;
+                    tunersSetUp(tuner1);
                     return true;
             }
             return false;
@@ -167,9 +173,11 @@ public class TunerActivity extends MainActivity {
                         .setItems(tunersArray, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (which == 1) {
-                                    //tunerThread.interrupt();
-                                    Intent startGuitarTuner = new Intent(TunerActivity.this, GuitarTunerActivity.class);
-                                    startActivity(startGuitarTuner);
+                                    tuner1 = 3;
+                                    tunersSetUp(tuner1);
+                                } else if (which == 0) {
+                                    tuner1 = 1;
+                                    tunersSetUp(tuner1);
                                 }
                             }
                         });
@@ -178,12 +186,6 @@ public class TunerActivity extends MainActivity {
                 dialog.show();
             }
         });
-
-        cr_scale.setVisibility(View.VISIBLE);
-        pointer.setVisibility(View.VISIBLE);
-        octive.setVisibility(View.VISIBLE);
-
-        notePicker.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -213,8 +215,9 @@ public class TunerActivity extends MainActivity {
                                 } else {
                                     lightThemed = true;
                                 }
-                                //tunerThread.interrupt();
+                                tunerThread.interrupt();
                                 Intent restart = new Intent(getBaseContext(), TunerActivity.class);
+                                finish();
                                 startActivity(restart);
                             }
                         });
@@ -228,8 +231,9 @@ public class TunerActivity extends MainActivity {
                                 } else {
                                     lightThemed = true;
                                 }
-                                //tunerThread.interrupt();
+                                tunerThread.interrupt();
                                 Intent restart = new Intent(getBaseContext(), TunerActivity.class);
+                                finish();
                                 startActivity(restart);
                             }
                         });
@@ -241,9 +245,73 @@ public class TunerActivity extends MainActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        // On selecting a spinner item
+        String item = parent.getItemAtPosition(position).toString();
+        tuning = position;
+        setUpDisplay();
+
+        // Showing selected spinner item
+        if (tuner1 == 3) {
+            Toast.makeText(TunerActivity.this, "" + item, Toast.LENGTH_LONG).show();
+        }
+    }
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void onClick(View v) {
+        // Perform action on click
+        switch(v.getId()) {
+            case R.id.button1:
+                display.setText(button1.getText());
+                button1.setBackgroundColor(Color.BLUE);
+                reset(1);
+                tuningF = getNoteFrequency(1, tuning);
+                tuningIndex = 1;
+                break;
+            case R.id.button2:
+                display.setText(button2.getText());
+                button2.setBackgroundColor(Color.BLUE);
+                reset(2);
+                tuningF = getNoteFrequency(2, tuning);
+                tuningIndex = 2;
+                break;
+            case R.id.button3:
+                display.setText(button3.getText());
+                button3.setBackgroundColor(Color.BLUE);
+                reset(3);
+                tuningF = getNoteFrequency(3, tuning);
+                tuningIndex = 3;
+                break;
+            case R.id.button4:
+                display.setText(button4.getText());
+                button4.setBackgroundColor(Color.BLUE);
+                reset(4);
+                tuningF = getNoteFrequency(4, tuning);
+                tuningIndex = 4;
+                break;
+            case R.id.button5:
+                display.setText(button5.getText());
+                button5.setBackgroundColor(Color.BLUE);
+                reset(5);
+                tuningF = getNoteFrequency(5, tuning);
+                tuningIndex = 5;
+                break;
+            case R.id.button6:
+                display.setText(button6.getText());
+                button6.setBackgroundColor(Color.BLUE);
+                reset(6);
+                tuningF = getNoteFrequency(6, tuning);
+                tuningIndex = 6;
+                break;
+        }
+    }
+
     private void wireWidgets() {
         differenceDisplay = findViewById(R.id.speedView);
-        displayNote = findViewById(R.id.textiew_displayNote);
         tuneProgressBar = findViewById(R.id.tuneProgressBar);
         cr_scale = findViewById(R.id.cr_image);
         octive = findViewById(R.id.octiveDisplay);
@@ -252,7 +320,29 @@ public class TunerActivity extends MainActivity {
         setUpNotePicker();
         toolbar = findViewById(R.id.toolbar);
         navigation = findViewById(R.id.navigation);
-        container = findViewById(R.id.container);
+        spinner = findViewById(R.id.spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.planets_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+        display = findViewById(R.id.display);
+        notesDisplay = findViewById(R.id.noteDisplay);
+        button1 = findViewById(R.id.button1);
+        button1.setOnClickListener(this);
+        button2 = findViewById(R.id.button2);
+        button2.setOnClickListener(this);
+        button3 = findViewById(R.id.button3);
+        button3.setOnClickListener(this);
+        button4 = findViewById(R.id.button4);
+        button4.setOnClickListener(this);
+        button5 = findViewById(R.id.button5);
+        button5.setOnClickListener(this);
+        button6 = findViewById(R.id.button6);
+        button6.setOnClickListener(this);
     }
 
     private void setUpNotePicker() {
@@ -281,62 +371,72 @@ public class TunerActivity extends MainActivity {
                 final float pitchInHz = result.getPitch();
                 final int selectedNoteIndex = notePicker.getCurrentItemPosition();
                 final String selectedNoteName = notes.get(selectedNoteIndex);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //display.setText("" + findNote(pitchInHz));
-                        if (tuner1) {
-                            if (pitchTimer == 3) {
-                                lastPitch = pitchInHz;
-                                pitchTimer = 0;
-                            }
-                            if (pitchInHz == -1) {
-                                pitchTimer++;
-                            }
-                            int diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
-                            setDisplay(diff);
-                            //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
-                            octive.setText("" + getOctive(pitchInHz));
-                            cr_scale.setRotation(getRotationAngle(findNote(roundPitch(lastPitch, pitchInHz))));
-                            if (Math.abs(findScaledDiff(roundPitch(lastPitch, pitchInHz))) <= 1
-                                    && progressBarTimer < 50) {
-                                tuneProgressBar.speedPercentTo(progressBarTimer*6);
-                                progressBarTimer++;
-                                if (tuneProgressBar.getCurrentSpeed() >= 90) {
-                                    Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
-                                }
-                            } else {
-                                tuneProgressBar.speedPercentTo(0, 1000);
-                                progressBarTimer = 1;
-                            }
-                            //Log.d("tag", "" + findScaledDiff(roundPitch(lastPitch, pitchInHz)));
-                        } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
                             //display.setText("" + findNote(pitchInHz));
                             if (pitchTimer == 3) {
                                 lastPitch = pitchInHz;
                                 pitchTimer = 0;
                             }
-                            if (pitchInHz == -1) {
+                            if (pitchInHz == -1 || (pitchInHz-lastPitch)>= pitchInHz/2) {
                                 pitchTimer++;
                             }
-                            int diff = findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName);
-                            setDisplay2(diff);
-                            if (Math.abs(findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName)) <= 3
-                                    && progressBarTimer < 50) {
-                                tuneProgressBar.speedPercentTo(progressBarTimer*6);
-                                progressBarTimer++;
-                                if (tuneProgressBar.getCurrentSpeed() >= 90) {
-                                    Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+
+                            if (tuner1 == 1) {
+                                int diff = findScaledDiff(roundPitch(lastPitch, pitchInHz));
+                                setDisplay(diff);
+                                //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
+                                octive.setText("" + getOctive(pitchInHz));
+                                cr_scale.setRotation(getRotationAngle(findNote(roundPitch(lastPitch, pitchInHz))));
+                                if (Math.abs(findScaledDiff(roundPitch(lastPitch, pitchInHz))) == 0 && findScaledDiff(roundPitch(lastPitch, pitchInHz))!=-10
+                                        && progressBarTimer < 40) {
+                                    tuneProgressBar.speedPercentTo(progressBarTimer*10);
+                                    progressBarTimer++;
+                                    if (tuneProgressBar.getCurrentSpeed() >= 90) {
+                                        Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    tuneProgressBar.speedPercentTo(0, 1000);
+                                    progressBarTimer = 1;
                                 }
+                                //Log.d("tag", "" + findScaledDiff(roundPitch(lastPitch, pitchInHz)));
+
+                            } else if (tuner1 == 2) {
+                                //display.setText("" + findNote(pitchInHz));
+                                int diff = findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName);
+                                setDisplay2(diff);
+                                if (Math.abs(findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName)) <= 1
+                                        && progressBarTimer < 50) {
+                                    tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                                    progressBarTimer++;
+                                    if (tuneProgressBar.getCurrentSpeed() >= 90) {
+                                        Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    tuneProgressBar.speedPercentTo(0, 1000);
+                                    progressBarTimer = 1;
+                                }
+                                //Log.d("tag", "" + findScaledDiff2(roundPitch(lastPitch, pitchInHz)));
                             } else {
-                                tuneProgressBar.speedPercentTo(0, 1000);
-                                progressBarTimer = 1;
+                                int diff = findScaledDiff3(roundPitch(lastPitch, pitchInHz));
+                                setDisplay2(diff);
+                                //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
+                                if (Math.abs(findScaledDiff3(roundPitch(lastPitch, pitchInHz))) <= 1
+                                        && progressBarTimer < 50) {
+                                    tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                                    progressBarTimer++;
+                                    if (tuneProgressBar.getCurrentSpeed() >= 90) {
+                                        Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
+                                        tuned[tuningIndex-1] = true;
+                                    }
+                                } else {
+                                    tuneProgressBar.speedPercentTo(0, 1000);
+                                    progressBarTimer = 1;
+                                }
                             }
-                            //Log.d("tag", "" + findScaledDiff2(roundPitch(lastPitch, pitchInHz)));
-                            //Log.d("tag", "" + selectedNoteName);
                         }
-                    }
-                });
+                    });
             }
         };
         AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
@@ -346,21 +446,23 @@ public class TunerActivity extends MainActivity {
     }
 
     private void setDisplay(int diff) {
-        if (Math.abs(diff) <= 1) {
+        if (diff == -10) {
+            differenceDisplay.speedPercentTo(50);
+        } else if (Math.abs(diff) == 0) {
             differenceDisplay.speedPercentTo(50, 300);
-        } else if (Math.abs(diff) <= 2) {
+        } else if (Math.abs(diff) <= 1) {
             if (diff > 0) {
                 differenceDisplay.speedPercentTo(60, 300);
             } else {
                 differenceDisplay.speedPercentTo(40, 300);
             }
-        } else if (Math.abs(diff) <= 3) {
+        } else if (Math.abs(diff) <= 2) {
             if (diff > 0) {
                 differenceDisplay.speedPercentTo(70, 300);
             } else {
                 differenceDisplay.speedPercentTo(30, 300);
             }
-        } else if (Math.abs(diff) <= 4) {
+        } else if (Math.abs(diff) <= 3) {
             if (diff > 0) {
                 differenceDisplay.speedPercentTo(80, 300);
             } else {
@@ -376,21 +478,21 @@ public class TunerActivity extends MainActivity {
     }
 
     private void setDisplay2(int diff) {
-        if (Math.abs(diff) <= 3) {
+        if (Math.abs(diff) <= 1) {
             differenceDisplay.speedPercentTo(50, 300);
-        } else if (Math.abs(diff) <= 10) {
+        } else if (Math.abs(diff) <= 5) {
             if (diff > 0) {
                 differenceDisplay.speedPercentTo(60, 300);
             } else {
                 differenceDisplay.speedPercentTo(40, 300);
             }
-        } else if (Math.abs(diff) <= 50) {
+        } else if (Math.abs(diff) <= 10) {
             if (diff > 0) {
                 differenceDisplay.speedPercentTo(70, 300);
             } else {
                 differenceDisplay.speedPercentTo(30, 300);
             }
-        } else if (Math.abs(diff) <= 100) {
+        } else if (Math.abs(diff) <= 30) {
             if (diff > 0) {
                 differenceDisplay.speedPercentTo(80, 300);
             } else {
@@ -488,7 +590,7 @@ public class TunerActivity extends MainActivity {
     }
 
     private int findScaledDiff(double frequency) {  // percent off from a scale of 1 to 10
-        double minDifference = 10;
+        double minDifference = 100;
         int index = 0;
 
         if (frequency != -1) {
@@ -505,17 +607,17 @@ public class TunerActivity extends MainActivity {
                 if (frequency >= lastFrequency && frequency <= thisFrequency) {
                     double diff = thisFrequency - lastFrequency;
                     double scaleSection = diff / 5;
-                    int n = 1;
-                    while (thisFrequency - n*scaleSection > frequency) {
+                    int n = 0;
+                    while (Math.abs(thisFrequency - n*scaleSection - frequency) > scaleSection) {
                         thisFrequency -= n*scaleSection;
                         n++;
                     }
-                    return +n;
+                    return n;
                 } else if (frequency >= thisFrequency && frequency <= nextFrequency) {
                     double diff = nextFrequency - thisFrequency;
                     double scaleSection = diff / 5;
-                    int n = 1;
-                    while (thisFrequency + n*scaleSection < frequency) {
+                    int n = 0;
+                    while (Math.abs(thisFrequency + n*scaleSection - frequency) > scaleSection) {
                         thisFrequency += n*scaleSection;
                         n++;
                     }
@@ -605,6 +707,185 @@ public class TunerActivity extends MainActivity {
         return new double[] {noteFrequencies[a], noteFrequencies[a+12], noteFrequencies[a+12*2], noteFrequencies[a+12*3],
                 noteFrequencies[a+12*4], noteFrequencies[a+12*5], noteFrequencies[a+12*6],
                 noteFrequencies[a+12*7], noteFrequencies[a+12*8]};
+    }
+
+    private void setUpDisplay() {
+        if (tuning == 0) {
+            button1.setText("E");
+            button2.setText("A");
+            button3.setText("D");
+            button4.setText("G");
+            button5.setText("B");
+            button6.setText("E");
+        } else if (tuning == 1) {
+            button1.setText("D");
+            button2.setText("G");
+            button3.setText("D");
+            button4.setText("G");
+            button5.setText("B");
+            button6.setText("D");
+        } else if (tuning == 2) {
+            button1.setText("D");
+            button2.setText("A");
+            button3.setText("D");
+            button4.setText("F♯");
+            button5.setText("A");
+            button6.setText("D");
+        } else if (tuning == 3) {
+            button1.setText("D");
+            button2.setText("A");
+            button3.setText("D");
+            button4.setText("G");
+            button5.setText("B");
+            button6.setText("E");
+        } else if (tuning == 4) {
+            button1.setText("E");
+            button2.setText("B");
+            button3.setText("E");
+            button4.setText("G♯");
+            button5.setText("B");
+            button6.setText("E");
+        } else if (tuning == 5) {
+            button1.setText("D♯");
+            button2.setText("G♯");
+            button3.setText("C♯");
+            button4.setText("F♯");
+            button5.setText("A♯");
+            button6.setText("D♯");
+        } else if (tuning == 6) {
+            button1.setText("D");
+            button2.setText("A");
+            button3.setText("D");
+            button4.setText("G");
+            button5.setText("A");
+            button6.setText("D");
+        }
+        display.setText(" ");
+        button1.setBackgroundColor(Color.LTGRAY);
+        button2.setBackgroundColor(Color.LTGRAY);
+        button3.setBackgroundColor(Color.LTGRAY);
+        button4.setBackgroundColor(Color.LTGRAY);
+        button5.setBackgroundColor(Color.LTGRAY);
+        button6.setBackgroundColor(Color.LTGRAY);
+        tuned = new boolean[] {false, false, false, false, false, false};
+    }
+
+    public void reset(int index) {
+        for (int i = 1; i <= 6; i++) {
+            Button a = (Button)(notesDisplay.getChildAt(i));
+            if (i != index) {
+                if (!tuned[i-1]) {
+                    a.setBackgroundColor(Color.LTGRAY);
+                } else {
+                    a.setBackgroundColor(Color.GREEN);
+                }
+            } else {
+                if (tuned[i-1]) {
+                    a.setBackgroundColor(Color.GREEN);
+                }
+            }
+        }
+    }
+
+    private int findScaledDiff3(double frequency) {
+        if (frequency != -1) {
+            return (int)(frequency - tuningF);
+        } else {
+            return -10;
+        }
+    }
+
+    private double getNoteFrequency(int index, int tuning) {
+        if (tuning == 0) {
+            if (index == 1) {return tuning0[0];}
+            if (index == 2) {return tuning0[1];}
+            if (index == 3) {return tuning0[2];}
+            if (index == 4) {return tuning0[3];}
+            if (index == 5) {return tuning0[4];}
+            if (index == 6) {return tuning0[5];}
+        } else if (tuning == 1) {
+            if (index == 1) {return tuning1[0];}
+            if (index == 2) {return tuning1[1];}
+            if (index == 3) {return tuning1[2];}
+            if (index == 4) {return tuning1[3];}
+            if (index == 5) {return tuning1[4];}
+            if (index == 6) {return tuning1[5];}
+        } else if (tuning == 2) {
+            if (index == 1) {return tuning2[0];}
+            if (index == 2) {return tuning2[1];}
+            if (index == 3) {return tuning2[2];}
+            if (index == 4) {return tuning2[3];}
+            if (index == 5) {return tuning2[4];}
+            if (index == 6) {return tuning2[5];}
+        } else if (tuning == 3) {
+            if (index == 1) {return tuning3[0];}
+            if (index == 2) {return tuning3[1];}
+            if (index == 3) {return tuning3[2];}
+            if (index == 4) {return tuning3[3];}
+            if (index == 5) {return tuning3[4];}
+            if (index == 6) {return tuning3[5];}
+        } else if (tuning == 4) {
+            if (index == 1) {return tuning4[0];}
+            if (index == 2) {return tuning4[1];}
+            if (index == 3) {return tuning4[2];}
+            if (index == 4) {return tuning4[3];}
+            if (index == 5) {return tuning4[4];}
+            if (index == 6) {return tuning4[5];}
+        } else {
+            if (index == 1) {return tuning5[0];}
+            if (index == 2) {return tuning5[1];}
+            if (index == 3) {return tuning5[2];}
+            if (index == 4) {return tuning5[3];}
+            if (index == 5) {return tuning5[4];}
+            if (index == 6) {return tuning5[5];}
+        }
+        return 0;
+    }
+
+    private void tunersSetUp(int tuner1) {
+        if (tuner1 == 1) {
+            navigation.setVisibility(View.VISIBLE);
+            navigation.setEnabled(true);
+
+            cr_scale.setVisibility(View.VISIBLE);
+            pointer.setVisibility(View.VISIBLE);
+            octive.setVisibility(View.VISIBLE);
+
+            notePicker.setVisibility(View.INVISIBLE);
+
+            spinner.setVisibility(View.INVISIBLE);
+            spinner.setEnabled(false);
+            display.setVisibility(View.INVISIBLE);
+            notesDisplay.setVisibility(View.INVISIBLE);
+        } else if (tuner1 == 2) {
+            navigation.setVisibility(View.VISIBLE);
+            navigation.setEnabled(true);
+
+            cr_scale.setVisibility(View.INVISIBLE);
+            pointer.setVisibility(View.INVISIBLE);
+            octive.setVisibility(View.INVISIBLE);
+
+            notePicker.setVisibility(View.VISIBLE);
+
+            spinner.setVisibility(View.INVISIBLE);
+            spinner.setEnabled(false);
+            display.setVisibility(View.INVISIBLE);
+            notesDisplay.setVisibility(View.INVISIBLE);
+        } else {
+            navigation.setVisibility(View.INVISIBLE);
+            navigation.setEnabled(false);
+
+            cr_scale.setVisibility(View.INVISIBLE);
+            pointer.setVisibility(View.INVISIBLE);
+            octive.setVisibility(View.INVISIBLE);
+
+            notePicker.setVisibility(View.INVISIBLE);
+
+            spinner.setVisibility(View.VISIBLE);
+            spinner.setEnabled(true);
+            display.setVisibility(View.VISIBLE);
+            notesDisplay.setVisibility(View.VISIBLE);
+        }
     }
 
 }
