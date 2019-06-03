@@ -408,9 +408,9 @@ public class TunerActivity extends MainActivity implements AdapterView.OnItemSel
                                 //display.setText("" + findNote(pitchInHz));
                                 int diff = findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName);
                                 setDisplay2(diff);
-                                if (Math.abs(findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName)) <= 1
+                                if (Math.abs(findScaledDiff2(roundPitch(lastPitch, pitchInHz), selectedNoteName)) <= 2
                                         && progressBarTimer < 50) {
-                                    tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                                    tuneProgressBar.speedPercentTo(progressBarTimer*10);
                                     progressBarTimer++;
                                     if (tuneProgressBar.getCurrentSpeed() >= 90) {
                                         Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
@@ -426,7 +426,7 @@ public class TunerActivity extends MainActivity implements AdapterView.OnItemSel
                                 //displayNote.setText(findNote(roundPitch(lastPitch, pitchInHz)));
                                 if (Math.abs(findScaledDiff3(roundPitch(lastPitch, pitchInHz))) <= 1
                                         && progressBarTimer < 50) {
-                                    tuneProgressBar.speedPercentTo(progressBarTimer*6);
+                                    tuneProgressBar.speedPercentTo(progressBarTimer*10);
                                     progressBarTimer++;
                                     if (tuneProgressBar.getCurrentSpeed() >= 90) {
                                         Toast.makeText(TunerActivity.this, "In tune! "+ findNote(roundPitch(lastPitch, pitchInHz)), Toast.LENGTH_SHORT).show();
