@@ -1,6 +1,8 @@
 package com.example.tunertest1;
 
 import android.Manifest;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;

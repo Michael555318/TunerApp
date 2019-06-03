@@ -2,6 +2,9 @@ package com.example.tunertest1;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
@@ -59,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         metronome = findViewById(R.id.metronome);
         tuner = findViewById(R.id.tuner);
 
+        Intent in=new Intent(getBaseContext(),TunerActivity.class);
+        startActivity(in);
+        overridePendingTransition(0, 0);
+
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
         {
             @Override
@@ -69,13 +76,26 @@ public class MainActivity extends AppCompatActivity {
                 {
                     case R.id.metronome:
                         in=new Intent(getBaseContext(),MetronomeActivity.class);
+                        finish();
                         startActivity(in);
                         overridePendingTransition(0, 0);
                         break;
                     case R.id.tuner:
+//                        in = new Intent(getBaseContext(), TunerActivity.class);
+//                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                        finishAffinity();
+//                        finish();
+//                        startActivity(in);
+
                         in = new Intent(getBaseContext(), TunerActivity.class);
-                        startActivity(in);
-                        overridePendingTransition(0, 0);
+                        int mPendingIntentId = 123456;
+                        PendingIntent mPendingIntent = PendingIntent.getActivity(getBaseContext(), mPendingIntentId, in,
+                                PendingIntent.FLAG_CANCEL_CURRENT);
+                        AlarmManager mgr = (AlarmManager) getBaseContext().getSystemService(Context.ALARM_SERVICE);
+                        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                        System.exit(0);
+
                         break;
                     default:
                         break;
