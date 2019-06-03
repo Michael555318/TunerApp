@@ -18,7 +18,7 @@
         android:elevation="10dp"
         android:foregroundGravity="bottom"
         android:orientation="horizontal"
-        android:paddingTop="5dp"
+        android:paddingTop="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -39,9 +39,9 @@
                 android:layout_weight="1"
                 android:button="@null"
                 android:checked="false"
-                android:drawableTop="@drawable/ic_home_black_24dp"
+                android:drawableTop="@drawable/rythm"
                 android:gravity="center"
-                android:padding="2dp"
+                android:padding="7dp"
                 android:text="Metronome"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp" />
@@ -54,9 +54,9 @@
                 android:layout_weight="1"
                 android:button="@null"
                 android:checked="false"
-                android:drawableTop="@drawable/ic_notifications_black_24dp"
+                android:drawableTop="@drawable/diapason"
                 android:gravity="center"
-                android:padding="2dp"
+                android:padding="7dp"
                 android:text="Tuner"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
