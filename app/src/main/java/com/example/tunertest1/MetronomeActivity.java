@@ -171,7 +171,7 @@ public class MetronomeActivity extends MainActivity {
                                         {
                                             if(count % 2 == 0)
                                             {
-                                                layout.setBackgroundColor(Color.parseColor("#ffffff"));
+                                                layout.setBackgroundColor(Color.parseColor("#F6F7EB"));
                                                 bpm.setTextColor(Color.parseColor("#4c4c4c"));
                                                 beatdisplay.setTextColor(Color.parseColor("#4c4c4c"));
                                                 offbeats.setTextColor(Color.parseColor("#4c4c4c"));
@@ -257,7 +257,7 @@ public class MetronomeActivity extends MainActivity {
                                         {
                                             if(count % 2 == 0)
                                             {
-                                                layout.setBackgroundColor(Color.parseColor("#ffffff"));
+                                                layout.setBackgroundColor(Color.parseColor("#F6F7EB"));
                                                 bpm.setTextColor(Color.parseColor("#4c4c4c"));
                                                 beatdisplay.setTextColor(Color.parseColor("#4c4c4c"));
                                                 offbeats.setTextColor(Color.parseColor("#4c4c4c"));
@@ -298,7 +298,7 @@ public class MetronomeActivity extends MainActivity {
                                             {
                                                 if(count % 2 == 0)
                                                 {
-                                                    layout.setBackgroundColor(Color.parseColor("#ffffff"));
+                                                    layout.setBackgroundColor(Color.parseColor("#F6F7EB"));
                                                     bpm.setTextColor(Color.parseColor("#4c4c4c"));
                                                     beatdisplay.setTextColor(Color.parseColor("#4c4c4c"));
                                                     offbeats.setTextColor(Color.parseColor("#4c4c4c"));
@@ -367,15 +367,24 @@ public class MetronomeActivity extends MainActivity {
                 countdown.cancel();
                 soundPool.autoPause();
 
-                layout.setBackgroundColor(Color.parseColor("#202020"));
-                bpm.setTextColor(Color.parseColor("#8fff3a"));
-                beatdisplay.setTextColor(Color.parseColor("#8fff3a"));
-                offbeats.setTextColor(Color.parseColor("#8fff3a"));
-                efirst.setTextColor(Color.parseColor("#8fff3a"));
-                hidecounts.setTextColor(Color.parseColor("#8fff3a"));
-                cats.setTextColor(Color.parseColor("#8fff3a"));
-                firstOnly.setTextColor(Color.parseColor("#8fff3a"));
-                flash.setTextColor(Color.parseColor("#8fff3a"));
+//                layout.setBackgroundColor(Color.parseColor("#202020"));
+//                bpm.setTextColor(Color.parseColor("#8fff3a"));
+//                beatdisplay.setTextColor(Color.parseColor("#8fff3a"));
+//                offbeats.setTextColor(Color.parseColor("#8fff3a"));
+//                efirst.setTextColor(Color.parseColor("#8fff3a"));
+//                hidecounts.setTextColor(Color.parseColor("#8fff3a"));
+//                cats.setTextColor(Color.parseColor("#8fff3a"));
+//                firstOnly.setTextColor(Color.parseColor("#8fff3a"));
+//                flash.setTextColor(Color.parseColor("#8fff3a"));
+                layout.setBackgroundColor(Color.parseColor("#F6F7EB"));
+                bpm.setTextColor(Color.parseColor("#E94F37"));
+                beatdisplay.setTextColor(Color.parseColor("#E94F37"));
+                offbeats.setTextColor(Color.parseColor("#E94F37"));
+                efirst.setTextColor(Color.parseColor("#E94F37"));
+                hidecounts.setTextColor(Color.parseColor("#E94F37"));
+                cats.setTextColor(Color.parseColor("#E94F37"));
+                firstOnly.setTextColor(Color.parseColor("#E94F37"));
+                flash.setTextColor(Color.parseColor("#E94F37"));
 
                 stopped = true;
 
