@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TunerTest1</string>
+    <string name="app_name">MetroTune</string>
     <string name="title_activity_tuner">TunerActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>

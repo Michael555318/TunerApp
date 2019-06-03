@@ -9,11 +9,11 @@
 
     <LinearLayout
         android:id="@+id/bottonNavBar"
-        android:layout_width="436dp"
+        android:layout_width="match_parent"
         android:layout_height="59dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
         android:background="@color/colorPrimary"
         android:elevation="10dp"
         android:foregroundGravity="bottom"
@@ -71,6 +71,7 @@
         android:layout_marginBottom="56dp"
         android:background="@color/white"
         android:layout_gravity="bottom">
+
 
     </LinearLayout>
 

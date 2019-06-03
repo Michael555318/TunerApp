@@ -62,9 +62,9 @@
             android:layout_width="match_parent"
             android:layout_height="204dp"
             app:sv_image="@drawable/lime_green"
-            app:sv_speedTextColor="#ffffff"
+            app:sv_speedTextColor="#FFFFFF"
             app:sv_speedTextPosition="BOTTOM_CENTER"
-            app:sv_speedometerBackColor="#ffffff"
+            app:sv_speedometerBackColor="#F6F7EB"
             app:sv_unit=" " />
 
         <TextView
@@ -77,10 +77,10 @@
             android:layout_height="237dp"
             android:layout_gravity="center"
             app:sv_endDegree="360"
-            app:sv_highSpeedColor="#F53309"
-            app:sv_lowSpeedColor="#F53309"
+            app:sv_highSpeedColor="#E94F37"
+            app:sv_lowSpeedColor="#E94F37"
             app:sv_lowSpeedPercent="45"
-            app:sv_mediumSpeedColor="#78f503"
+            app:sv_mediumSpeedColor="#72D316"
             app:sv_mediumSpeedPercent="55"
             app:sv_speedTextPosition="CENTER"
             app:sv_speedometerWidth="30dp"
